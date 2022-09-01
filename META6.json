@@ -12,11 +12,12 @@
   "name": "Math::Angle",
   "perl": "6.d",
   "provides": {
-    "Math::Angle": "lib/Math/Angle.rakumod"
+    "Math::Angle": "lib/Math/Angle.rakumod",
+    "Math::pi": "lib/Math/pi.rakumod"
   },
   "resources": [
   ],
-  "source-url": "",
+  "source-url": "https://github.com/kjpye/Math-Angle.git",
   "tags": [
   ],
   "test-depends": [
