@@ -1,0 +1,25 @@
+{
+  "auth": "zef:kjpye",
+  "authors": [
+    "Kevin Pye"
+  ],
+  "build-depends": [
+  ],
+  "depends": [
+  ],
+  "description": "a class to handle geometric angles",
+  "license": "Artistic-2.0",
+  "name": "Math::Angle",
+  "perl": "6.d",
+  "provides": {
+    "Math::Angle": "lib/Math/Angle.rakumod"
+  },
+  "resources": [
+  ],
+  "source-url": "",
+  "tags": [
+  ],
+  "test-depends": [
+  ],
+  "version": "0.0.1"
+}

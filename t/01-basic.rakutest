@@ -1,0 +1,33 @@
+use Test;
+use Math::Angle;
+
+plan 19;
+
+my $a1 = Math::Angle.new(deg => 45);
+my $a2 = Math::Angle.new(rad => 0.5);
+my $a3 = Math::Angle.new(grad => 50);
+my $a4 = Math::Angle.new(angle => 2.3);
+
+is-approx $a1.deg, 45, 'round-trip degree input';
+is-approx $a2.rad, 0.5, 'round-trip radian input';
+is-approx $a3.grad, 50, 'round-trip grad input';
+dies-ok {$a4}, 'incorrectly specified value';
+is-approx Math::Angle.new(:45deg).rad, π/4, 'alternative input format';
+is-approx $a1.sin, sin(π/4), 'sin';
+is-approx $a1.cos, cos(π/4), 'cos method';
+is-approx cos($a1), cos(π/4), 'cos function';
+
+is-approx ($a1 + $a2).rad, π/4 + 0.5, 'addition of angles';
+is-approx ($a1 * 3).rad, 3 × π/4, 'multiplication angle by real';
+is-approx (2 × $a1).rad, 2 × π/4, 'multiplication real by angle';
+is-approx ($a1 / 2).rad, π/8, 'division angle by real(*)';
+is-approx ($a1 ÷ 2).rad, π/8, 'division angle by real(×)';
+is-approx ($a1 / $a3), 1, 'ratio of angles';
+is-approx Math::Angle::acos(sqrt(2)/2).rad, π/4, 'acos';
+is-approx Math::Angle::atan2(2, 1).rad, 1.1071487177, 'atan2';
+
+is-deeply from-dms('45°'), Math::Angle.new(:45deg), 'new from degree string';
+is-approx from-dms("25° 42m 51.42857S N").rad, Math::Angle.new(rad => π / 7).rad, 'from-dms';
+is-approx from-dms("25° 42′ 51.42857″ N").rad, Math::Angle.new(rad => π / 7).rad, 'from-dms';
+
+# done-testing;

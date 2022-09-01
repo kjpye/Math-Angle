@@ -1,0 +1,213 @@
+=begin pod
+
+=head1 NAME
+
+Math::Angle - a class to handle geometric angles
+
+=head1 SYNOPSIS
+
+=begin code :lang<raku>
+
+use Math::Angle;
+my \φ = Math::Angle.new(deg => 63.4);
+say φ.sin;
+say cos φ;
+
+=end code
+
+=head1 DESCRIPTION
+
+Math::Angle defines objects which represent angles.
+It was written to try to prevent the problems I kept encountering
+in forgetting to convert angles between radians and degrees.
+
+Thus an angle may be defined in terms of radians, degrees or grads,
+and then used in trigonometric expressions without concern for conversion
+between units.
+
+The standard trigonometric functions available in Raku can all be
+used as either methods on the C<Math::Angle> object, or as functions
+with the C<Math::Angle> object as argument.
+
+In addition, subroutines are available for the inverse trigonometric
+functions which return a Math::Angle object.
+
+Some basic arithmetic using C<Math::Angle> objects is also possible
+where it makes sense.
+
+=head2 Object creation
+
+C<Math::Angle> objects are created by calling the C<Math::Angle.new>
+routine with a named argument specifying the angle required. The following three possibilities are equivalent:
+
+=begin code :lang<raku>
+my $φ = Math::Angle.new(rad => π/4);
+my $η = Math::Angle.new(deg => 45);
+my $θ = Math::Angle.new(grad => 50);
+=end code
+
+=head2 Accessing the angle value
+
+The angle embedded within a C<Math::Angle> object can be accessed using the three methods C<rad>, C<deg>, and C<grad> which convert the internal value to the requested representation
+
+Note that it is thus possible to convert an angle from degrees to radians by writing
+
+=begin code :lang<raku>
+Math::Angle.new(deg => 27).rad
+=end code
+
+=head2 Arithmetic
+
+Arithmetic involving C<Math::Angle> objects is possible where it makes sense:
+                                                                                                          
+=begin code :lang<raku>
+my \φ1 = Math::Angle.new(:37deg);
+my \φ2 = Math::Angle.new(rad => π/6);
+say (φ1 - φ2).deg;
+say (φ1 + φ2).rad;
+say (φ1 × 2).rad;
+say (4 × φ2).deg;
+say φ1 ÷ φ2;
+=end code
+
+With the exception of division, the results of all those objects will be
+a C<Math::Angle> object. The result of the division is a plain number
+representing the ratio of the two angles.
+
+=head2 Coercion
+
+C<Math::Angle> has two coercion methods, C<Numeric> and C<Comples>.
+C<Numeric> returns the numeric value of the angle in radians. C<Complex> returns a complex number with radius 1 and angle given by the C<Math::Angle> object.
+
+C<Math::Angle> also inherits from C<Cool>. When combined with the C<Numeric>
+coercion, this gives access to the trigonometric functions
+C<sin>,
+C<cos>,
+C<tan>,
+C<sec>,
+C<cosec>,
+C<cotan>,
+C<sinh>,
+C<cosh>,
+C<tanh>,
+C<sech>.
+C<cosech>, and
+C<cotanh>.
+These may all be used as functions with the C<Math::Angle> object as argument,
+or as methods on the C<Math::Angle> object.
+
+It probably also leads to all sorts of other undesirable effects.
+
+=head2 Functions
+
+The following standard trigonometric functions may be used to return
+a C<Math::Angle> object:
+C<asin>,
+C<acos>,
+C<atan>,
+C<atan2>,
+C<asec>,
+C<acosec>,
+C<acotan>,
+C<asinh>,
+C<acosh>,
+C<atanh>,
+C<asech>,
+C<acosech>, and 
+C<acotanh>.
+
+=head3 from-dms
+
+C<from-dms> takes a string argument representing an angle in degrees, minutes and seconds, and converts it into a Math::Angle object.
+
+The string contains:
+
+=item B<sign>
+An optional sign C<+> or C<->;
+=item B<degrees>
+An optional decimal number of degrees followed by a degree designator (one of the degree symbol (C<°>) or a letter C<d> of either case);
+=item B<minutes>
+An optional decimal number of minutes followed by a minutes designator (one of a single quote (C<'>), the Unicode character C<U+2032>—C<PRIME>, or the letter C<m> in either case);
+=item B<seconds>
+An optional decimal number of seconds followed by a seconds designator (one of a double quote C<">), the Unicode character C<U+2033>)—C<DOUBLE PRIME>, or the letter C<s> in either case);
+=item B<hemisphere>
+To allow for latitude and longitude to be represented easily, the angle can be followed by one of the letters C<E>, C<W>, C<N> or C<S> in either case. If the letter is C<N> or C<E> then the angle is positive; if it is C<S> or C<W> then the angle is negative. Note that if a sign is also present at the start of the string, then the two indicators are both used. Thus an angle like C<-12°S> will end up being positive,
+
+The various fields may be separated by white space.
+
+The decimal numbers can be fractional, and contain exponents such as C<12.53e5>.
+
+Note that no sanity checks are made. An angle of "C<-2473.2857° 372974.2746′ 17382.2948e5s W>" is acceptable, and equal to about C<491531.046°>. The values for degrees, minutes and seconds are simply added together with the appropriate scaling and with the appropriate sign calculated from the initial sign and the hemisphere.
+
+If the seconds are designated by the letter C<S> and a hemisphere is also specified, then they must be separated by whitespace.
+
+=head2 Alternative representations
+
+Two methods are available to prdoduce string output in useful forms for angles expressed in degrees.
+
+=head3 dms
+
+Method C<dms> will return a string containing a representation of the angle in degrees, minutes and seconds. For example:
+
+=begin code :lang<raku>
+Math::Angle.new(rad => 0.82).dms.say; # 46° 58' 57.1411"
+=end code
+
+However the output is fairly configurable.
+For example, signed numbers can be output in various forms:
+
+=begin code :lang<raku>
+Math::Angle.new(rad => -0.82).dms.say; # -46° 58' 57.1411"
+Math::Angle.new(rad => 0.82).dms(presign=>"+-").say; # +46° 58' 57.1411"
+Math::Angle.new(rad => 0.82).dms(presign=>"", postsign=>"NS").say; # 46° 58' 57.1411"N
+Math::Angle.new(rad => -0.82).dms(presign=>"", postsign=>"NS").say; # 46° 58' 57.1411"S
+Math::Angle.new(rad => -0.82).dms(presign=>"", postsign=>"EW").say; # 46° 58' 57.1411"W
+=end code
+
+The full set of options is:
+=begin table
+ option | meaning | default
+ _____
+ degsym | A string representing the symbol printed after the number of degrees | "°" (unicode U00B0 — DEGREE SIGN)
+ minsym | A string representing the symbol printed after the number of minutes | "′" (unicode U2032 — PRIME)
+ secsym | (dms only) A string giving the symbol printed after the number of seconds | '″' (unicode U2033 — DOUBLE PRIME)
+ presign | A string where the first chracter is printed before a positive number, and the second character is printed before a negative number | " -" (a space and a minus sign)
+ postsign | A string where the first character is printed after a positive number, and the second character is printed after a negative number | "  " (two spaces)
+ separator | A string printed between the degrees and minutes, and between the minutes and seconds | " "
+ secfmt | (dms only) The format string for the seconds field | "%.4f"
+ minfmt | (dm only) The format string for the minutes field | "%.4f"
+=end table
+
+Note for C<presign> and C<postsign> that a blank in the string is not printed.
+
+=head3 dm
+
+Method C<dm> will return a string containing a representation of the angle in degrees and minutes. For example:
+
+=begin code :lang<raku>
+Math::Angle.new(rad => 0.82).dm.say; # 46° 58' 57.1411"
+=end code
+
+The same configurability as in C<dms> is available:
+
+=begin code :lang<raku>
+Math::Angle.new(rad => -0.82).dm.say; # -46° 58.9524'
+Math::Angle.new(rad => 0.82).dm(presign=>"+-").say; # +46° 58.9524'
+Math::Angle.new(rad => 0.82).dm(presign=>"", postsign=>"NS").say; # 46° 58.9524'N
+Math::Angle.new(rad => -0.82).dm(presign=>"", postsign=>"NS").say; # 46° 58.9524'S
+Math::Angle.new(rad => -0.82).dm(presign=>"", postsign=>"EW").say; # 46° 58.9524'W
+=end code
+
+The options are the same as for dms, except that C<secsig> is not available and C<secfmt> is replaced by C<minfmt>.
+
+=head1 AUTHOR
+
+Kevin Pye <kjpraku@pye.id.au>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2022 Kevin Pye
+
+This library is free software; you can redistribute it and/or modify it under the Artistic License 2.0.
+
+=end pod
