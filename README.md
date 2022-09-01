@@ -108,24 +108,24 @@ If the seconds are designated by the letter `S` and a hemisphere is also specifi
 Alternative representations
 ---------------------------
 
-Two methods are available to prdoduce string output in useful forms for angles expressed in degrees.
+Two methods are available to produce string output in useful forms for angles expressed in degrees.
 
 ### dms
 
 Method `dms` will return a string containing a representation of the angle in degrees, minutes and seconds. For example:
 
 ```raku
-Math::Angle.new(rad => 0.82).dms.say; # 46° 58' 57.1411"
+Math::Angle.new(rad => 0.82).dms.say; # 46° 58′ 57.1411″
 ```
 
 However the output is fairly configurable. For example, signed numbers can be output in various forms:
 
 ```raku
-Math::Angle.new(rad => -0.82).dms.say; # -46° 58' 57.1411"
-Math::Angle.new(rad => 0.82).dms(presign=>"+-").say; # +46° 58' 57.1411"
-Math::Angle.new(rad => 0.82).dms(presign=>"", postsign=>"NS").say; # 46° 58' 57.1411"N
-Math::Angle.new(rad => -0.82).dms(presign=>"", postsign=>"NS").say; # 46° 58' 57.1411"S
-Math::Angle.new(rad => -0.82).dms(presign=>"", postsign=>"EW").say; # 46° 58' 57.1411"W
+Math::Angle.new(rad => -0.82).dms.say; # -46° 58′ 57.1411″
+Math::Angle.new(rad => 0.82).dms(presign=>"+-").say; # +46° 58′ 57.1411″
+Math::Angle.new(rad => 0.82).dms(presign=>"", postsign=>"NS").say; # 46° 58′ 57.1411″N
+Math::Angle.new(rad => -0.82).dms(presign=>"", postsign=>"NS").say; # 46° 58′ 57.1411″S
+Math::Angle.new(rad => -0.82).dms(presign=>"", postsign=>"EW").say; # 46° 58′ 57.1411″W
 ```
 
 The full set of options is:
@@ -152,11 +152,11 @@ Math::Angle.new(rad => 0.82).dm.say; # 46° 58' 57.1411"
 The same configurability as in `dms` is available:
 
 ```raku
-Math::Angle.new(rad => -0.82).dm.say; # -46° 58.9524'
-Math::Angle.new(rad => 0.82).dm(presign=>"+-").say; # +46° 58.9524'
+Math::Angle.new(rad => -0.82).dm.say; # -46° 58.9524′
+Math::Angle.new(rad => 0.82).dm(presign=>"+-").say; # +46° 58.9524′
 Math::Angle.new(rad => 0.82).dm(presign=>"", postsign=>"NS").say; # 46° 58.9524'N
-Math::Angle.new(rad => -0.82).dm(presign=>"", postsign=>"NS").say; # 46° 58.9524'S
-Math::Angle.new(rad => -0.82).dm(presign=>"", postsign=>"EW").say; # 46° 58.9524'W
+Math::Angle.new(rad => -0.82).dm(presign=>"", postsign=>"NS").say; # 46° 58.9524′S
+Math::Angle.new(rad => -0.82).dm(presign=>"", postsign=>"EW").say; # 46° 58.9524′W
 ```
 
 The options are the same as for dms, except that `secsig` is not available and `secfmt` is replaced by `minfmt`.
