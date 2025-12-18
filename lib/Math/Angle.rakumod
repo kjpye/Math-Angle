@@ -334,6 +334,9 @@ our sub acotanh(Real $a) is export {
     Math::Angle.new(rad => $a.acotanh);
 }
 
+method Complex() {
+    self.Numeric.cis;
+}
 method complex() {
     self.Numeric.cis;
 }
