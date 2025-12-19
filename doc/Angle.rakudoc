@@ -41,10 +41,11 @@ C<Math::Angle> objects are created by calling the C<Math::Angle.new>
 routine with a named argument specifying the angle required. The following three possibilities are equivalent:
 
 =begin code :lang<raku>
-my $φ = Math::Angle.new(rad => π/4);
-my $η = Math::Angle.new(deg => 45);
-my $θ = Math::Angle.new(grad => 50);
-my $t = Math::Angle.new(turn => 0.25);
+my $φ = Math::Angle.new(  :rad( π/4 ));
+my $λ = Math::Angle.new( :turn( 1/4 ));
+my $η = Math::Angle.new(  :deg( 45  ));
+my $α = Math::Angle.new( :hour(  6  ));
+my $θ = Math::Angle.new( :grad( 50  ));
 =end code
 
 =head2 Accessing the angle value
