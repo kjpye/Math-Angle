@@ -38,7 +38,7 @@ where it makes sense.
 =head2 Object creation
 
 C<Math::Angle> objects are created by calling the C<Math::Angle.new>
-routine with a named argument specifying the angle required. The following three possibilities are equivalent:
+routine with a named argument specifying the angle required. The following four possibilities are equivalent:
 
 =begin code :lang<raku>
 my $φ = Math::Angle.new(  :rad( π/4 ));
