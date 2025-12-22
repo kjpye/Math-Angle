@@ -22,19 +22,24 @@ my \rad2deg = Rat.new(180 × 21208174623389167, 66627445592888887);
 my \grad2rad = Rat.new(66627445592888887, 200 × 21208174623389167);
 my \rad2grad = Rat.new(200 × 21208174623389167, 66627445592888887);
 
+my \turn2rad = Rat.new(2 × 66627445592888887, 21208174623389167);
+my \rad2turn = Rat.new(21208174623389167, 2 × 66627445592888887);
+
 #| The angle. This is stored in radians, but that is transparent to the user.
 has $!angle is built;
 
-submethod TWEAK(:$rad, :$deg, :$grad, :$min, :$sec) {
+submethod TWEAK(:$rad, :$deg, :$grad, :$turn, :$min, :$sec) {
     if  ($rad.defined                                 ?? 1 !! 0)
       + ($deg.defined || $min.defined || $sec.defined ?? 1 !! 0)
       + ($grad.defined                                ?? 1 !! 0)
+      + ($turn.defined                                ?? 1 !! 0)
       ≠ 1
       or $!angle.defined {
-        fail 'Must specify exactly one of rad, deg or grad';
+        fail 'Must specify exactly one of rad, deg, grad, or turn';
     }
     $!angle = $rad             if $rad.defined;
     $!angle = $grad × grad2rad if $grad.defined;
+    $!angle = $turn × turn2rad if $turn.defined;
     if $deg.defined || $min.defined || $sec.defined {
         my $angle = 0;
         $angle += $deg        if $deg.defined;
@@ -57,6 +62,11 @@ method deg() {
 #! Return the angle in grads
 method grad() {
     $!angle × rad2grad;
+}
+
+#! Return the angle in turns
+method turn() {
+    $!angle × rad2turn;
 }
 
 #| Return a string representing the angle in degrees, minutes and seconds.
@@ -334,6 +344,9 @@ our sub acotanh(Real $a) is export {
     Math::Angle.new(rad => $a.acotanh);
 }
 
+method Complex() {
+    self.Numeric.cis;
+}
 method complex() {
     self.Numeric.cis;
 }

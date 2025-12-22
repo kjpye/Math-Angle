@@ -21,7 +21,7 @@ Math::Angle defines objects which represent angles.
 It was written to try to prevent the problems I kept encountering
 in forgetting to convert angles between radians and degrees.
 
-Thus an angle may be defined in terms of radians, degrees or grads,
+Thus an angle may be defined in terms of radians, degrees, grads, or turns,
 and then used in trigonometric expressions without concern for conversion
 between units.
 
@@ -38,17 +38,18 @@ where it makes sense.
 =head2 Object creation
 
 C<Math::Angle> objects are created by calling the C<Math::Angle.new>
-routine with a named argument specifying the angle required. The following three possibilities are equivalent:
+routine with a named argument specifying the angle required. The following four possibilities are equivalent:
 
 =begin code :lang<raku>
-my $φ = Math::Angle.new(rad => π/4);
-my $η = Math::Angle.new(deg => 45);
-my $θ = Math::Angle.new(grad => 50);
+my $φ = Math::Angle.new(  :rad( π/4 ));
+my $λ = Math::Angle.new( :turn( 1/8 ));
+my $η = Math::Angle.new(  :deg( 45  ));
+my $θ = Math::Angle.new( :grad( 50  ));
 =end code
 
 =head2 Accessing the angle value
 
-The angle embedded within a C<Math::Angle> object can be accessed using the three methods C<rad>, C<deg>, and C<grad> which convert the internal value to the requested representation
+The angle embedded within a C<Math::Angle> object can be accessed using the four methods C<rad>, C<deg>, C<grad> and C<turn> which convert the internal value to the requested representation
 
 Note that it is thus possible to convert an angle from degrees to radians by writing
 
@@ -76,7 +77,7 @@ representing the ratio of the two angles.
 
 =head2 Coercion
 
-C<Math::Angle> has two coercion methods, C<Numeric> and C<Comples>.
+C<Math::Angle> has two coercion methods, C<Numeric> and C<Complex>.
 C<Numeric> returns the numeric value of the angle in radians. C<Complex> returns a complex number with radius 1 and angle given by the C<Math::Angle> object.
 
 C<Math::Angle> also inherits from C<Cool>. When combined with the C<Numeric>
