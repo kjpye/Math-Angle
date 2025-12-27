@@ -179,7 +179,7 @@ from the initial sign.
 
 =head2 Alternative representations
 
-Two methods are available to produce string output in useful forms for angles expressed in degrees.
+Four methods are available to produce string output in useful forms for angles expressed in degrees or hours.
 
 =head3 dms
 
@@ -216,6 +216,35 @@ The full set of options is:
 
 Note for C<presign> and C<postsign> that a blank in the string is not printed.
 
+=head3 hms
+
+Method C<hms> will return a string containing a representation of the angle in hours, minutes and seconds. For example:
+
+=begin code :lang<raku>
+Math::Angle.new(rad => 0.82).hms.say; # 3ʰ 7ᵐ 55.8094ˢ
+=end code
+
+The output is configurable for sign output and decimal format. For example:
+
+=begin code :lang<raku>
+Math::Angle.new(:rad(-0.82)).hms.say;                   # -3ʰ 7ᵐ 55.8094ˢ
+Math::Angle.new(:rad( 0.82)).hms(presign=>"+-").say;    # +3ʰ 7ᵐ 55.8094ˢ
+=end code
+
+The full set of options is:
+=begin table
+ option | meaning | default
+ _____
+ hrsym   | A string representing the symbol printed after the number of hours | "ʰ" (unicode U02B0 — MODIFIER LETTER SMALL H)
+ minsym  | A string representing the symbol printed after the number of minutes | "ᵐ" (unicode U1D50 — MODIFIER LETTER SMALL M)
+ secsym  | (hms only) A string giving the symbol printed after the number of seconds | 'ˢ' (unicode U02E2 — MODIFIER LETTER SMALL S)
+ presign | A string where the first character prefixes a positive number, and the second a negative number | " -" (space, minus sign)
+ secfmt  | The format string for the seconds field | "%.4f"
+ minfmt  | The format string for the minutes field | "%.4f"
+=end table
+
+Note for C<presign> that a blank in the string is not printed.
+
 =head3 dm
 
 Method C<dm> will return a string containing a representation of the angle in degrees and minutes. For example:
@@ -235,6 +264,24 @@ Math::Angle.new(rad => -0.82).dm(presign=>"", postsign=>"EW").say; # 46° 58.952
 =end code
 
 The options are the same as for dms, except that C<secsym> is not available and C<secfmt> is replaced by C<minfmt>.
+
+=head3 hm
+
+Method C<hm> will return a string containing a representation of the angle in hours and minutes. For example:
+
+=begin code :lang<raku>
+Math::Angle.new(:rad(0.82)).hm.say;                                             # 3ʰ 8ᵐ
+Math::Angle.new(:rad(-0.82)).hm(:minfmt('%07.4f') :hrsym(':') :minsym('')).say; # -3:07.9302
+=end code
+
+The same configurability as in C<hms> is available:
+
+=begin code :lang<raku>
+Math::Angle.new(rad => -0.82).dm.say; # -3ʰ07.9302ᵐ
+Math::Angle.new(rad => 0.82).dm(presign=>"+-").say; # +3ʰ07.9302ᵐ
+=end code
+
+The options are the same as for hms, except that C<secsym> is not available and C<secfmt> is replaced by C<minfmt>.
 
 =head1 AUTHOR
 
