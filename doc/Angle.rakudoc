@@ -21,7 +21,7 @@ Math::Angle defines objects which represent angles.
 It was written to try to prevent the problems I kept encountering
 in forgetting to convert angles between radians and degrees.
 
-Thus an angle may be defined in terms of radians, degrees, grads, or turns,
+Thus an angle may be defined in terms of radians, degrees, hours, grads, or turns,
 and then used in trigonometric expressions without concern for conversion
 between units.
 
@@ -38,18 +38,30 @@ where it makes sense.
 =head2 Object creation
 
 C<Math::Angle> objects are created by calling the C<Math::Angle.new>
-routine with a named argument specifying the angle required. The following four possibilities are equivalent:
+routine with a named argument specifying the angle required. The following five possibilities are equivalent:
 
 =begin code :lang<raku>
 my $φ = Math::Angle.new(  :rad( π/4 ));
 my $λ = Math::Angle.new( :turn( 1/8 ));
 my $η = Math::Angle.new(  :deg( 45  ));
 my $θ = Math::Angle.new( :grad( 50  ));
+my $α = Math::Angle.new( :hour( 3  ));
+=end code
+
+When C<Math::Angle.new> is called on named arguments C<min> or
+C<sec> without also supplying C<deg> or C<hour>, then the minutes
+and seconds are interpreted as minutes and seconds of arc, not of
+time-angle: that is, as if C<:deg(0)> accompanied them. Use C<:hour(0)>
+to force the other interpretation.
+
+=begin code :lang<raku>
+my Math::Angle $b .= new( :min(30) :sec(30) );
+say $b.dms              # OUTPUT: 0° 30′ 30.0000″
 =end code
 
 =head2 Accessing the angle value
 
-The angle embedded within a C<Math::Angle> object can be accessed using the four methods C<rad>, C<deg>, C<grad> and C<turn> which convert the internal value to the requested representation
+The angle embedded within a C<Math::Angle> object can be accessed using the five methods C<rad>, C<deg>, C<hour>, C<grad> and C<turn> which convert the internal value to the requested representation
 
 Note that it is thus possible to convert an angle from degrees to radians by writing
 
@@ -141,6 +153,29 @@ The decimal numbers can be fractional, and contain exponents such as C<12.53e5>.
 Note that no sanity checks are made. An angle of "C<-2473.2857° 372974.2746′ 17382.2948e5s W>" is acceptable, and equal to about C<491531.046°>. The values for degrees, minutes and seconds are simply added together with the appropriate scaling and with the appropriate sign calculated from the initial sign and the hemisphere.
 
 If the seconds are designated by the letter C<S> and a hemisphere is also specified, then they must be separated by whitespace.
+
+=head3 from-hms
+
+C<from-hms> takes a string argument representing an angle in hours, minutes, and seconds, and converts it into a Math::Angle object.
+
+The string contains:
+
+=item B<sign>
+An optional sign C<+> or C<->;
+=item B<hours>
+An optional decimal number of hours followed by an hour designator (one of the hour symbol (C<ʰ>) or a letter C<h> of either case);
+=item B<minutes>
+An optional decimal number of minutes followed by a minutes designator (one of the minute symbol (C<ᵐ>) or the letter C<m> in either case);
+=item B<seconds>
+An optional decimal number of seconds followed by a seconds designator (one of a seconds symbol C<ˢ>) or the letter C<s> in either case);
+
+The various fields may be separated by white space.
+
+The decimal numbers can be fractional, and contain exponents such as C<12.53e5>.
+
+Note that no sanity checks are made, as with degree-minute-second (see above).
+The values for hours, minutes and seconds are simply added together with the appropriate scaling and with the appropriate sign calculated
+from the initial sign.
 
 =head2 Alternative representations
 
