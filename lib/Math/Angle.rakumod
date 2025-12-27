@@ -72,7 +72,7 @@ method turn() {
 #| Return a string representing the angle in degrees, minutes and seconds.
 
 method dms(:$degsym = '°',
-           :$minsym = "′",
+           :$minsym = '′',
            :$secsym = '″',
            :$separator = ' ',
            :$presign = ' -',
@@ -99,7 +99,7 @@ method dms(:$degsym = '°',
     $beforesign ~ $deg ~ $degsym ~ $separator ~ $min ~ $minsym ~ $separator ~ sprintf($secfmt, $sec) ~ $secsym ~ $aftersign;
 }
 #`««
-  By default, the returned string looks similar to «-43° 26' 4.2841"», but
+  By default, the returned string looks similar to «-43° 26′ 4.2841″», but
   is significantly configurable.
 
   The symbols used to represent degrees, minutes and seconds can be changed
@@ -119,7 +119,7 @@ method dms(:$degsym = '°',
 
   Thus, if the angle above represented a latitude, then specifying
   C<presign> as '  ' (two spaces), and C<postsign> as 'NS', then the
-  returned string would be «43° 23' 4.2841"S».
+  returned string would be «43° 23′ 4.2841″S».
 
   The C<separator> named parameter can be specified to change the separator
   between the degress and minutes, and between the minutes and seconds.
@@ -129,7 +129,7 @@ method dms(:$degsym = '°',
 #|««
   Return a string representing the angle in degrees and minutes.
 
-  By default, the returned string looks similar to «-43° 26.2841'», but
+  By default, the returned string looks similar to «-43° 26.2841′», but
   is significantly configurable.
 
   The symbols used to represent degrees and minutes can be changed
@@ -148,14 +148,14 @@ method dms(:$degsym = '°',
 
   Thus, if the angle above represented a latitude, then specifying
   C<presign> as '  ' (two spaces), and C<postsign> as 'EW', then the
-  returned string would be «43° 23.2841'W».
+  returned string would be «43° 23.2841′W».
 
   The C<separator> named parameter can be specified to change the separator
   between the degress and minutes, and between the mintes and seconds.
 »»
 
 method dm(:$degsym = '°',
-          :$minsym = "'",
+          :$minsym = "′",
           :$separator = ' ',
           :$presign = ' -',
           :$postsign = '  ',
