@@ -80,6 +80,11 @@ method turn() {
     $!angle × rad2turn;
 }
 
+#! Return the angle in hours
+method hour() {
+    $!angle × rad2hour;
+}
+
 #| Return a string representing the angle in degrees, minutes and seconds.
 
 method dms(:$degsym = '°',
@@ -362,12 +367,13 @@ method complex() {
     self.Numeric.cis;
 }
 
+my @hrsyms  = <ʰ h H>;
 my @degsyms = <° d D>;
-my @minsyms = <' ′ m M>;
-my @secsyms = <" ″ s S>;
+my @minsyms = <' ′ m M ᵐ>;
+my @secsyms = <" ″ s S ˢ>;
 
 #|««
-  Grammar C<DMS> matches a string representing an angle specified in
+  Grammar C<Sexagesimal> matches a string representing an angle specified in
   degrees, minutes, and seconds.
 
   The string consists of an optional sign, followed by fields representing
@@ -392,18 +398,19 @@ my @secsyms = <" ″ s S>;
   This is a bug!
 »»
 
-grammar DMS {
-    rule TOP {<leading-sign> <deg> <min> <sec> <trailing-sign>
+grammar Sexagesimal {
+    rule TOP {<leading-sign> <aliq> <min> <sec> <trailing-sign>
               {
                   make $<trailing-sign>.made
                      × $<leading-sign>.made
-                     × ($<deg>.made + $<min>.made  + $<sec>.made)
+                     × ($<aliq>.made + $<min>.made  + $<sec>.made)
                   ;
                   }
              }
-    token deg {
+    token aliq {
         |                         {make 0;}
-        | (<number>) @degsyms     {make +$0}}
+        | (<number>) @degsyms     {make +$0}
+        | (<number>) @hrsyms      {make +$0}}
     token min {
         |                         {make 0;}
         | (<number>) @minsyms     {make +$0 ÷ 60}}
@@ -440,10 +447,21 @@ grammar DMS {
 »»
 
 our sub from-dms(Str $s) is export {
-    my $m = Math::Angle::DMS.parse($s);
+    fail("from-dms called on HMS string") if $s.contains: @hrsyms.any;
+    my $m = Math::Angle::Sexagesimal.parse($s);
     if $m {
         Math::Angle.new(deg => +$m.made);
     } else {
         fail("unrecognised angle in string");
+    }
+}
+
+our sub from-hms(Str $s) is export {
+    fail "from-hms called on DMS string" if $s.contains: @degsyms.any;
+    my $m = Math::Angle::Sexagesimal.parse($s);
+    if $m {
+        Math::Angle.new(:hour( +$m.made ));
+    } else {
+        fail "unrecognised angle in string";
     }
 }
