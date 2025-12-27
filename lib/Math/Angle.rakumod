@@ -28,24 +28,35 @@ my \rad2turn = Rat.new(21208174623389167, 2 × 66627445592888887);
 #| The angle. This is stored in radians, but that is transparent to the user.
 has $!angle is built;
 
-submethod TWEAK(:$rad, :$deg, :$grad, :$turn, :$min, :$sec) {
-    if  ($rad.defined                                 ?? 1 !! 0)
-      + ($deg.defined || $min.defined || $sec.defined ?? 1 !! 0)
-      + ($grad.defined                                ?? 1 !! 0)
-      + ($turn.defined                                ?? 1 !! 0)
-      ≠ 1
-      or $!angle.defined {
-        fail 'Must specify exactly one of rad, deg, grad, or turn';
+
+submethod TWEAK( :$rad, :$grad, :$turn, :$deg is copy, :$hour is copy,
+                 :$min is copy, :$sec is copy,
+) {
+    if $!angle.defined
+        or ( grep(*.defined, $rad, $deg, $hour, $grad, $turn) ≠ 1
+         and grep(*.defined, $min, $sec) < 1  )
+    {
+        fail 'Must specify exactly one of rad, deg, grad, hour, or turn';
     }
-    $!angle = $rad             if $rad.defined;
-    $!angle = $grad × grad2rad if $grad.defined;
-    $!angle = $turn × turn2rad if $turn.defined;
-    if $deg.defined || $min.defined || $sec.defined {
-        my $angle = 0;
-        $angle += $deg        if $deg.defined;
-        $angle += $min ÷   60 if $min.defined;
-        $angle += $sec ÷ 3600 if $sec.defined;
-        $!angle = $angle × deg2rad;
+    $sec /= 60 with $sec;
+    with $min {
+        $min += $sec // 0;
+        $min /= 60;
+    }
+    with   $rad  { $!angle = $rad }
+    orwith $grad { $!angle = $grad × grad2rad }
+    orwith $turn { $!angle = $turn × turn2rad }
+    orwith $hour {
+        $hour += $min // 0;
+        $!angle = $hour × hour2rad;
+    }
+    orwith $deg  {
+        $deg  += $min // 0;
+        $!angle = $deg  × deg2rad;
+    }
+    # orig API assumes arcminutes here, not minutes of time
+    else {
+        $!angle = $min  × deg2rad;
     }
 }
 
