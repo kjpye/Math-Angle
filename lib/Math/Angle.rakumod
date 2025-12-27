@@ -25,6 +25,9 @@ my \rad2grad = Rat.new(200 × 21208174623389167, 66627445592888887);
 my \turn2rad = Rat.new(2 × 66627445592888887, 21208174623389167);
 my \rad2turn = Rat.new(21208174623389167, 2 × 66627445592888887);
 
+my \hour2rad = Rat.new(66627445592888887, 12 × 21208174623389167);
+my \rad2hour = Rat.new(12 × 21208174623389167, 66627445592888887);
+
 #| The angle. This is stored in radians, but that is transparent to the user.
 has $!angle is built;
 

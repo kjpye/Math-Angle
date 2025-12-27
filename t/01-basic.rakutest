@@ -1,12 +1,12 @@
 use Test;
 use Math::Angle;
 
-plan 20;
+plan 17;
 
-my $a1 = Math::Angle.new(deg => 45);
-my $a2 = Math::Angle.new(rad => 0.5);
-my $a3 = Math::Angle.new(grad => 50);
-my $a4 = Math::Angle.new(angle => 2.3);
+my $a1 = Math::Angle.new(:45deg);
+my $a2 = Math::Angle.new(:rad(0.5));
+my $a3 = Math::Angle.new(:50grad);
+my $a4 = Math::Angle.new(:angle(2.3));
 my $a5 = Math::Angle.new(:turn(0.2));
 
 is-approx $a1.deg, 45, 'round-trip degree input';
@@ -28,8 +28,4 @@ is-approx ($a1 / $a3), 1, 'ratio of angles';
 is-approx Math::Angle::acos(sqrt(2)/2).rad, π/4, 'acos';
 is-approx Math::Angle::atan2(2, 1).rad, 1.1071487177, 'atan2';
 
-is-deeply from-dms('45°'), Math::Angle.new(:45deg), 'new from degree string';
-is-approx from-dms("25° 42m 51.42857S N").rad, Math::Angle.new(rad => π / 7).rad, 'from-dms';
-is-approx from-dms("25° 42′ 51.42857″ N").rad, Math::Angle.new(rad => π / 7).rad, 'from-dms';
-
-# done-testing;
+done-testing; # optional with `plan`

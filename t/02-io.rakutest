@@ -1,0 +1,48 @@
+use Test;
+use Math::Angle;
+
+plan 18;
+
+my Math::Angle $pi7ths .= new: :rad(π/7);
+
+is-deeply from-dms('45°'), Math::Angle.new(:45deg), 'new from degree string';
+is-approx from-dms("25° 42m 51.42857S N").rad, $pi7ths.rad, 'from-dms';
+is-approx from-dms("25° 42′ 51.42857″ N").rad, $pi7ths.rad, 'from-dms';
+
+my Math::Angle $r1 .= new: :1rad;
+
+is-approx from-hms("3h 49m 11s").rad, $r1.rad, 'from-hms';
+dies-ok { from-dms("3h 49m 11s") }, 'from-dms called on HMS string';
+dies-ok { from-hms("3° 49′ 11″") }, 'from-hms called on DMS string';
+
+with $r1 {
+    is .dms, ' 57° 17′ 44.8062″ ', 'dms';
+    is .dm,  ' 57° 17.7468′ ',     'dm';
+    is .hms,  ' 3ʰ 49ᵐ 10.9871ˢ ', 'hms';
+    is .hm,   ' 3ʰ 49.1831ᵐ ',     'hm';
+}
+$r1 *= -1;
+with $r1 {
+    is .hms,  '-3ʰ 49ᵐ 10.9871ˢ ', 'negative hms';
+    is .hm,   '-3ʰ 49.1831ᵐ ',     'negative hm';
+}
+$r1 *= -1;
+
+my $minfmt = '%9.6f';
+my $secfmt = '%9.6f';
+my $postsign = 'NS';
+
+with $r1 {
+    is .dm(:$minfmt),    ' 57° 17.746771′ ',     'dm w/ minfmt';
+    is .dms(:$secfmt),   ' 57° 17′ 44.806247″ ', 'dms w/ secfmt';
+    is .dm(:$postsign),  ' 57° 17.7468′N',       'dm w/ postsign';
+    is .dms(:$postsign), ' 57° 17′ 44.8062″N',   'dms w/ postsign';
+}
+$r1 *= -1;
+with $r1 {
+    is .dm(:$postsign),   '-57° 17.7468′S',     'dm w/ neg postsign';
+    is .dms(:$postsign),  '-57° 17′ 44.8062″S', 'dms w/ neg postsign';
+}
+$r1 *= -1;
+
+done-testing; # optional with `plan`
