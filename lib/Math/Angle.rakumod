@@ -119,7 +119,7 @@ method dms(:$degsym = '°',
   is significantly configurable.
 
   The symbols used to represent degrees, minutes and seconds can be changed
-  by specifying the named paramaters C<degsym>, C<minsym> and C<secsym>
+  by specifying the named parameters C<degsym>, C<minsym> and C<secsym>
   respectively.
 
   The representation of seconds can be changed by specifying a printf
@@ -138,7 +138,7 @@ method dms(:$degsym = '°',
   returned string would be «43° 23′ 4.2841″S».
 
   The C<separator> named parameter can be specified to change the separator
-  between the degress and minutes, and between the minutes and seconds.
+  between the degrees and minutes, and between the minutes and seconds.
 »»
 
 
@@ -149,7 +149,7 @@ method dms(:$degsym = '°',
   is significantly configurable.
 
   The symbols used to represent degrees and minutes can be changed
-  by specifying the named paramaters C<degsym> and C<minsym> respectively.
+  by specifying the named parameters C<degsym> and C<minsym> respectively.
 
   The representation of minutes can be changed by specifying a printf
   format string for the C<minfmt> named parameter.
@@ -167,7 +167,7 @@ method dms(:$degsym = '°',
   returned string would be «43° 23.2841′W».
 
   The C<separator> named parameter can be specified to change the separator
-  between the degress and minutes, and between the mintes and seconds.
+  between the degrees and minutes, and between the minutes and seconds.
 »»
 
 method dm(:$degsym = '°',
@@ -378,7 +378,7 @@ my @secsyms = <" ″ s S ˢ>;
 
   The string consists of an optional sign, followed by fields representing
   the number of degrees, minutes and seconds in that order—although each
-  field is optional—followed by an optional 'N', 'S", 'E" or 'W' also
+  field is optional—followed by an optional 'N', 'S', 'E' or 'W' also
   representing the sign of the angle. (If a leading and trailing sign
   are both specified, then they are both applied—remember that two
   negatives make a positive.)
@@ -443,7 +443,7 @@ grammar Sexagesimal {
 }
 
 #|««
-  Return an C<Angle> object initialised with the value given by the argument string.  
+  Return an C<Angle> object initialised with the value given by the argument string.
 »»
 
 our sub from-dms(Str $s) is export {
