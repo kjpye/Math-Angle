@@ -45,7 +45,7 @@ my $φ = Math::Angle.new(  :rad( π/4 ));
 my $λ = Math::Angle.new( :turn( 1/8 ));
 my $η = Math::Angle.new(  :deg( 45  ));
 my $θ = Math::Angle.new( :grad( 50  ));
-my $α = Math::Angle.new( :hour( 3  ));
+my $α = Math::Angle.new( :hour( 3   ));
 =end code
 
 When C<Math::Angle.new> is called on named arguments C<min> or
@@ -142,7 +142,7 @@ An optional decimal number of degrees followed by a degree designator (one of th
 =item B<minutes>
 An optional decimal number of minutes followed by a minutes designator (one of a single quote (C<'>), the Unicode character C<U+2032>—C<PRIME>, or the letter C<m> in either case);
 =item B<seconds>
-An optional decimal number of seconds followed by a seconds designator (one of a double quote C<">), the Unicode character C<U+2033>)—C<DOUBLE PRIME>, or the letter C<s> in either case);
+An optional decimal number of seconds followed by a seconds designator (one of a double quote C<">), the Unicode character C<U+2033>—C<DOUBLE PRIME>, or the letter C<s> in either case);
 =item B<hemisphere>
 To allow for latitude and longitude to be represented easily, the angle can be followed by one of the letters C<E>, C<W>, C<N> or C<S> in either case. If the letter is C<N> or C<E> then the angle is positive; if it is C<S> or C<W> then the angle is negative. Note that if a sign is also present at the start of the string, then the two indicators are both used. Thus an angle like C<-12°S> will end up being positive.
 
@@ -207,8 +207,8 @@ The full set of options is:
  degsym | A string representing the symbol printed after the number of degrees | "°" (unicode U00B0 — DEGREE SIGN)
  minsym | A string representing the symbol printed after the number of minutes | "′" (unicode U2032 — PRIME)
  secsym | (dms only) A string giving the symbol printed after the number of seconds | '″' (unicode U2033 — DOUBLE PRIME)
- presign | A string where the first character is printed before a positive number, and the second character is printed before a negative number | " -" (a space and a minus sign)
- postsign | A string where the first character is printed after a positive number, and the second character is printed after a negative number | "  " (two spaces)
+ presign | A string where the first character is printed before a positive number, and the second character is printed before a negative number; spaces are not printed | " -" (a space and a minus sign)
+ postsign | A string where the first character is printed after a positive number, and the second character is printed after a negative number; spaces are not printed | "  " (two spaces)
  separator | A string printed between the degrees and minutes, and between the minutes and seconds | " "
  secfmt | (dms only) The format string for the seconds field | "%.4f"
  minfmt | (dm only) The format string for the minutes field | "%.4f"
