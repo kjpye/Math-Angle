@@ -38,7 +38,7 @@ my $φ = Math::Angle.new(  :rad( π/4 ));
 my $λ = Math::Angle.new( :turn( 1/8 ));
 my $η = Math::Angle.new(  :deg( 45  ));
 my $θ = Math::Angle.new( :grad( 50  ));
-my $α = Math::Angle.new( :hour( 3  ));
+my $α = Math::Angle.new( :hour( 3   ));
 ```
 
 When `Math::Angle.new` is called on named arguments `min` or `sec` without also supplying `deg` or `hour`, then the minutes and seconds are interpreted as minutes and seconds of arc, not of time-angle: that is, as if `:deg(0)` accompanied them. Use `:hour(0)` to force the other interpretation.
@@ -102,7 +102,7 @@ The string contains:
 
   * **minutes** An optional decimal number of minutes followed by a minutes designator (one of a single quote (`'`), the Unicode character `U+2032`—`PRIME`, or the letter `m` in either case);
 
-  * **seconds** An optional decimal number of seconds followed by a seconds designator (one of a double quote `"`), the Unicode character `U+2033`)—`DOUBLE PRIME`, or the letter `s` in either case);
+  * **seconds** An optional decimal number of seconds followed by a seconds designator (one of a double quote `"`), the Unicode character `U+2033`—`DOUBLE PRIME`, or the letter `s` in either case);
 
   * **hemisphere** To allow for latitude and longitude to be represented easily, the angle can be followed by one of the letters `E`, `W`, `N` or `S` in either case. If the letter is `N` or `E` then the angle is positive; if it is `S` or `W` then the angle is negative. Note that if a sign is also present at the start of the string, then the two indicators are both used. Thus an angle like `-12°S` will end up being positive.
 

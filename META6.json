@@ -1,4 +1,5 @@
 {
+  "api": "1",
   "auth": "zef:kjpye",
   "authors": [
     "Kevin Pye"
@@ -12,8 +13,7 @@
   "name": "Math::Angle",
   "perl": "6.d",
   "provides": {
-    "Math::Angle": "lib/Math/Angle.rakumod",
-    "Math::pi": "lib/Math/pi.rakumod"
+    "Math::Angle": "lib/Math/Angle.rakumod"
   },
   "resources": [
   ],
@@ -22,6 +22,5 @@
   ],
   "test-depends": [
   ],
-  "version": "0.0.1",
-  "api": "0"
+  "version": "0.1.0"
 }

@@ -2,5 +2,12 @@ Revision history for Math-Angle
 
 {{$NEXT}}
 
+0.1.0  2026-01-16T15:48:55+11:00
+    - Add turns and hms as forms of angle (arkiuat)
+    - Miscellaneous typo and documentation fixes
+    - Don't print spaces in pre- and post-sign strings (breaking)
+    - Rename the method "complex" to "Complex" as it always should have been
+    - Push API version to 1 because of previous 2 changes
+
 0.0.1  2022-09-01T15:38:14+10:00
     - Initial version
