@@ -91,7 +91,7 @@ method hour() {
 
 #| internal method to implement methods dms, dm, hms, & hm
 method sexagesimal( :@symbol,
-                    :@sign = (' -  '.comb); # ordering: pre+ pre- post+ post-
+                    :@sign is copy = (' -  '.comb); # ordering: pre+ pre- post+ post-
                     :$separator = ' ',
                     :@format,
                     Bool :$hour = False,   # False is degrees, True is hours
@@ -104,7 +104,7 @@ method sexagesimal( :@symbol,
         @format = $seconds ?? ('%d', '%02d', '%.4f') !! ('%d', '%.4f')
     }
     #| don't print signspaces (awaiting issue #5)
-    # @sign .= map({ $_ eq ' ' ?? '' !! $_ });
+    @sign .= map({ $_ eq ' ' ?? '' !! $_ });
     sub subdivide60( $u ) {
         push my @u, $u;
         push @u, $u - $u.Int;

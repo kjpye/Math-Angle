@@ -16,15 +16,15 @@ dies-ok { from-dms("3h 49m 11s") }, 'from-dms called on HMS string';
 dies-ok { from-hms("3° 49′ 11″") }, 'from-hms called on DMS string';
 
 with $r1 {
-    is .dms, ' 57° 17′ 44.8062″ ', 'dms';
-    is .dm,  ' 57° 17.7468′ ',     'dm';
-    is .hms,  ' 3ʰ 49ᵐ 10.9871ˢ ', 'hms';
-    is .hm,   ' 3ʰ 49.1831ᵐ ',     'hm';
+    is .dms, '57° 17′ 44.8062″', 'dms';
+    is .dm,  '57° 17.7468′',     'dm';
+    is .hms,  '3ʰ 49ᵐ 10.9871ˢ', 'hms';
+    is .hm,   '3ʰ 49.1831ᵐ',     'hm';
 }
 $r1 *= -1;
 with $r1 {
-    is .hms,  '-3ʰ 49ᵐ 10.9871ˢ ', 'negative hms';
-    is .hm,   '-3ʰ 49.1831ᵐ ',     'negative hm';
+    is .hms,  '-3ʰ 49ᵐ 10.9871ˢ', 'negative hms';
+    is .hm,   '-3ʰ 49.1831ᵐ',     'negative hm';
 }
 $r1 *= -1;
 
@@ -33,10 +33,10 @@ my $secfmt = '%9.6f';
 my $postsign = 'NS';
 
 with $r1 {
-    is .dm(:$minfmt),    ' 57° 17.746771′ ',     'dm w/ minfmt';
-    is .dms(:$secfmt),   ' 57° 17′ 44.806247″ ', 'dms w/ secfmt';
-    is .dm(:$postsign),  ' 57° 17.7468′N',       'dm w/ postsign';
-    is .dms(:$postsign), ' 57° 17′ 44.8062″N',   'dms w/ postsign';
+    is .dm(:$minfmt),    '57° 17.746771′',     'dm w/ minfmt';
+    is .dms(:$secfmt),   '57° 17′ 44.806247″', 'dms w/ secfmt';
+    is .dm(:$postsign),  '57° 17.7468′N',       'dm w/ postsign';
+    is .dms(:$postsign), '57° 17′ 44.8062″N',   'dms w/ postsign';
 }
 $r1 *= -1;
 with $r1 {
