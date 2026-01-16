@@ -22,25 +22,44 @@ my \rad2deg = Rat.new(180 × 21208174623389167, 66627445592888887);
 my \grad2rad = Rat.new(66627445592888887, 200 × 21208174623389167);
 my \rad2grad = Rat.new(200 × 21208174623389167, 66627445592888887);
 
+my \turn2rad = Rat.new(2 × 66627445592888887, 21208174623389167);
+my \rad2turn = Rat.new(21208174623389167, 2 × 66627445592888887);
+
+my \hour2rad = Rat.new(66627445592888887, 12 × 21208174623389167);
+my \rad2hour = Rat.new(12 × 21208174623389167, 66627445592888887);
+
 #| The angle. This is stored in radians, but that is transparent to the user.
 has $!angle is built;
 
-submethod TWEAK(:$rad, :$deg, :$grad, :$min, :$sec) {
-    if  ($rad.defined                                 ?? 1 !! 0)
-      + ($deg.defined || $min.defined || $sec.defined ?? 1 !! 0)
-      + ($grad.defined                                ?? 1 !! 0)
-      ≠ 1
-      or $!angle.defined {
-        fail 'Must specify exactly one of rad, deg or grad';
+
+submethod TWEAK( :$rad, :$grad, :$turn, :$deg is copy, :$hour is copy,
+                 :$min is copy, :$sec is copy,
+) {
+    if $!angle.defined
+        or ( grep(*.defined, $rad, $deg, $hour, $grad, $turn) ≠ 1
+         and grep(*.defined, $min, $sec) < 1  )
+    {
+        fail 'Must specify exactly one of rad, deg, grad, hour, or turn';
     }
-    $!angle = $rad             if $rad.defined;
-    $!angle = $grad × grad2rad if $grad.defined;
-    if $deg.defined || $min.defined || $sec.defined {
-        my $angle = 0;
-        $angle += $deg        if $deg.defined;
-        $angle += $min ÷   60 if $min.defined;
-        $angle += $sec ÷ 3600 if $sec.defined;
-        $!angle = $angle × deg2rad;
+    $sec /= 60 with $sec;
+    with $min {
+        $min += $sec // 0;
+        $min /= 60;
+    }
+    with   $rad  { $!angle = $rad }
+    orwith $grad { $!angle = $grad × grad2rad }
+    orwith $turn { $!angle = $turn × turn2rad }
+    orwith $hour {
+        $hour += $min // 0;
+        $!angle = $hour × hour2rad;
+    }
+    orwith $deg  {
+        $deg  += $min // 0;
+        $!angle = $deg  × deg2rad;
+    }
+    # orig API assumes arcminutes here, not minutes of time
+    else {
+        $!angle = $min  × deg2rad;
     }
 }
 
@@ -59,41 +78,71 @@ method grad() {
     $!angle × rad2grad;
 }
 
-#| Return a string representing the angle in degrees, minutes and seconds.
+#! Return the angle in turns
+method turn() {
+    $!angle × rad2turn;
+}
 
+#! Return the angle in hours
+method hour() {
+    $!angle × rad2hour;
+}
+
+
+#| internal method to implement methods dms, dm, hms, & hm
+method sexagesimal( :@symbol,
+                    :@sign = (' -  '.comb); # ordering: pre+ pre- post+ post-
+                    :$separator = ' ',
+                    :@format,
+                    Bool :$hour = False,   # False is degrees, True is hours
+                    Bool :$seconds = True, # when False, decimal minutes only
+) {
+    unless +@symbol {
+        @symbol = ($hour ?? 'ʰᵐˢ' !! '°′″').comb     # default symbols
+    }
+    unless +@format {
+        @format = $seconds ?? ('%d', '%02d', '%.4f') !! ('%d', '%.4f')
+    }
+    #| don't print signspaces (awaiting issue #5)
+    # @sign .= map({ $_ eq ' ' ?? '' !! $_ });
+    sub subdivide60( $u ) {
+        push my @u, $u;
+        push @u, $u - $u.Int;
+        @u[0] -= @u[1];
+        @u[1] *= 60;
+        @u
+    }
+    push my @units, $!angle × ($hour ?? rad2hour !! rad2deg);
+    my $i = @units[0] < 0 ?? 1 !! 0;    #= negative (i=1) or positive (i=0)
+    @units[0] .= abs;
+    @units = subdivide60 @units[0];
+    splice(@units, 1, 1, subdivide60 @units[1]) if $seconds;
+    my @formatted = (@format Z @units)
+                    .map: { .[0].defined ?? sprintf(.[0], .[1]) !! .[1] };
+    @sign[$i] ~ (@formatted Z~ @symbol).join($separator) ~ @sign[$i + 2]
+}
+
+
+#| Return a string representing the angle in degrees, minutes and seconds.
 method dms(:$degsym = '°',
-           :$minsym = "′",
-           :$secsym = '″',
+           :$minsym  = '′',
+           :$secsym  = '″',
            :$separator = ' ',
            :$presign = ' -',
            :$postsign = '  ',
            :$secfmt    = '%.4f',
-          ) {
-    my $pres = $presign ~ '  ';
-    my $posts = $postsign ~ '  ';
-    my $beforesign = '';
-    my $aftersign = '';
-    my $degrees = $!angle × rad2deg;
-    if $degrees < 0 {
-        $degrees    = - $degrees;
-        $beforesign = $pres.substr(1,1);
-        $aftersign  = $posts.substr(1,1);
-    } else {
-        $beforesign = $pres.substr(0,1);
-        $aftersign  = $posts.substr(0,1);
-    }
-    my $deg = $degrees.Int;
-    my $minutes = ($degrees - $deg) × 60;
-    my $min = $minutes.Int;
-    my $sec = ($minutes - $min) × 60;
-    $beforesign ~ $deg ~ $degsym ~ $separator ~ $min ~ $minsym ~ $separator ~ sprintf($secfmt, $sec) ~ $secsym ~ $aftersign;
+) {
+    self.sexagesimal( :symbol($degsym, $minsym, $secsym)
+                      :sign(($presign ~ $postsign).comb)
+                      :format(Nil, Nil, $secfmt)
+    )
 }
 #`««
-  By default, the returned string looks similar to «-43° 26' 4.2841"», but
+  By default, the returned string looks similar to «-43° 26′ 4.2841″», but
   is significantly configurable.
 
   The symbols used to represent degrees, minutes and seconds can be changed
-  by specifying the named paramaters C<degsym>, C<minsym> and C<secsym>
+  by specifying the named parameters C<degsym>, C<minsym> and C<secsym>
   respectively.
 
   The representation of seconds can be changed by specifying a printf
@@ -109,21 +158,34 @@ method dms(:$degsym = '°',
 
   Thus, if the angle above represented a latitude, then specifying
   C<presign> as '  ' (two spaces), and C<postsign> as 'NS', then the
-  returned string would be «43° 23' 4.2841"S».
+  returned string would be «43° 23′ 4.2841″S».
 
   The C<separator> named parameter can be specified to change the separator
-  between the degress and minutes, and between the minutes and seconds.
+  between the degrees and minutes, and between the minutes and seconds.
 »»
 
-
-#|««
+#| Return a string representing the angle in degrees and minutes.
+method dm(:$degsym = '°',
+          :$minsym = '′',
+          :$separator = ' ',
+          :$presign = ' -',
+          :$postsign = '  ',
+          :$minfmt    = '%.4f',
+) {
+    self.sexagesimal( :symbol($degsym, $minsym)
+                      :sign(($presign ~ $postsign).comb)
+                      :format(Nil, $minfmt)
+                      :!seconds
+    )
+}
+#`««
   Return a string representing the angle in degrees and minutes.
 
-  By default, the returned string looks similar to «-43° 26.2841'», but
+  By default, the returned string looks similar to «-43° 26.2841′», but
   is significantly configurable.
 
   The symbols used to represent degrees and minutes can be changed
-  by specifying the named paramaters C<degsym> and C<minsym> respectively.
+  by specifying the named parameters C<degsym> and C<minsym> respectively.
 
   The representation of minutes can be changed by specifying a printf
   format string for the C<minfmt> named parameter.
@@ -138,42 +200,88 @@ method dms(:$degsym = '°',
 
   Thus, if the angle above represented a latitude, then specifying
   C<presign> as '  ' (two spaces), and C<postsign> as 'EW', then the
-  returned string would be «43° 23.2841'W».
+  returned string would be «43° 23.2841′W».
 
   The C<separator> named parameter can be specified to change the separator
-  between the degress and minutes, and between the mintes and seconds.
+  between the degrees and minutes, and between the minutes and seconds.
 »»
 
-method dm(:$degsym = '°',
-          :$minsym = "'",
-          :$separator = ' ',
-          :$presign = ' -',
-          :$postsign = '  ',
-          :$minfmt    = '%.4f',
-         ) {
-    my $pres = $presign ~ '  ';
-    my $posts = $postsign ~ '  ';
-    my $beforesign = '';
-    my $aftersign = '';
-    my $degrees = $!angle × rad2deg;
-    if $degrees < 0 {
-        $degrees    = - $degrees;
-        $beforesign = $pres.substr(1,1);
-        $aftersign  = $posts.substr(1,1);
-    } else {
-        $beforesign = $pres.substr(0,1);
-        $aftersign  = $posts.substr(0,1);
-    }
-    my $deg = $degrees.Int;
-    my $min = ($degrees - $deg) × 60;
-    $beforesign ~ $deg ~ $degsym ~ $separator ~ sprintf($minfmt, $min) ~ $minsym ~ $aftersign;
+#| Return a string representing the angle in hours, minutes and seconds.
+method hms(:$hrsym     = 'ʰ',
+           :$minsym    = 'ᵐ',
+           :$secsym    = 'ˢ',
+           :$separator = ' ',
+           :$presign   = ' -',
+           :$secfmt    = '%.4f',
+) {
+    self.sexagesimal( :symbol($hrsym, $minsym, $secsym)
+                      :sign(($presign ~ '  ').comb)
+                      :format(Nil, Nil, $secfmt)
+                      :hour
+    )
 }
+#`««
+  By default, the returned string looks similar to «21ʰ 9ᵐ 44.2856ˢ», but
+  is configurable as that returned by method dms.
+
+  The symbols used to represent hours, minutes and seconds can be changed
+  by specifying the named parameters C<hrsym>, C<minsym> and C<secsym>
+  respectively.
+
+  The representation of seconds can be changed by specifying a printf
+  format string for the C<secfmt> named parameter.
+
+  The representation of positive and negative numbers can be changed by
+  specifying the value of the C<presign> named parameter.
+  The first character of C<presign> is printed before a positive angle.
+  The second character is printed after a positive angle.
+  If any character of C<presign> is a space, then it is not printed.
+
+  The C<separator> named parameter can be specified to change the separator
+  between the hours and minutes, and between the minutes and seconds.
+»»
+
+#| Return a string representing the angle in hours and minutes.
+method hm(:$hrsym     = 'ʰ',
+          :$minsym    = 'ᵐ',
+          :$separator = ' ',
+          :$presign   = ' -',
+          :$minfmt    = '%.4f',
+) {
+    self.sexagesimal( :symbol($hrsym, $minsym)
+                      :sign(($presign ~ '  ').comb)
+                      :format(Nil, $minfmt)
+                      :hour
+                      :!seconds
+    )
+}
+#`««
+  By default, the returned string looks similar to «21ʰ 9.7831ᵐ»,
+  but has similar configuration options as the other methods.
+
+  The symbols used to represent degrees and minutes can be changed
+  by specifying the named parameters C<degsym> and C<minsym> respectively.
+
+  The representation of minutes can be changed by specifying a printf
+  format string for the C<minfmt> named parameter.
+
+  The representation of positive and negative numbers can be changed by
+  specifying the values of the C<presign> named parameter.
+  The first character of C<presign> is printed before a positive angle.
+  The second character is printed before a negative angle.
+  If any character of C<presign> is a space, then it is not printed.
+
+  The C<separator> named parameter can be specified to change the separator
+  between the degrees and minutes, and between the minutes and seconds.
+»»
+
 
 enum Math::Angle::Range is export (
     SYMMETRIC => 0,
     POSITIVE  => 1,
 );
 
+#| Normalize the C<Angle> object in place (does not create a new object).
 method normalize(:$range = SYMMETRIC) {
     my $newangle = $!angle;
     $newangle += π if $range == SYMMETRIC;
@@ -334,21 +442,25 @@ our sub acotanh(Real $a) is export {
     Math::Angle.new(rad => $a.acotanh);
 }
 
+method Complex() {
+    self.Numeric.cis;
+}
 method complex() {
     self.Numeric.cis;
 }
 
+my @hrsyms  = <ʰ h H>;
 my @degsyms = <° d D>;
-my @minsyms = <' ′ m M>;
-my @secsyms = <" ″ s S>;
+my @minsyms = <' ′ m M ᵐ>;
+my @secsyms = <" ″ s S ˢ>;
 
 #|««
-  Grammar C<DMS> matches a string representing an angle specified in
+  Grammar C<Sexagesimal> matches a string representing an angle specified in
   degrees, minutes, and seconds.
 
   The string consists of an optional sign, followed by fields representing
   the number of degrees, minutes and seconds in that order—although each
-  field is optional—followed by an optional 'N', 'S", 'E" or 'W' also
+  field is optional—followed by an optional 'N', 'S', 'E' or 'W' also
   representing the sign of the angle. (If a leading and trailing sign
   are both specified, then they are both applied—remember that two
   negatives make a positive.)
@@ -368,18 +480,19 @@ my @secsyms = <" ″ s S>;
   This is a bug!
 »»
 
-grammar DMS {
-    rule TOP {<leading-sign> <deg> <min> <sec> <trailing-sign>
+grammar Sexagesimal {
+    rule TOP {<leading-sign> <aliq> <min> <sec> <trailing-sign>
               {
                   make $<trailing-sign>.made
                      × $<leading-sign>.made
-                     × ($<deg>.made + $<min>.made  + $<sec>.made)
+                     × ($<aliq>.made + $<min>.made  + $<sec>.made)
                   ;
                   }
              }
-    token deg {
+    token aliq {
         |                         {make 0;}
-        | (<number>) @degsyms     {make +$0}}
+        | (<number>) @degsyms     {make +$0}
+        | (<number>) @hrsyms      {make +$0}}
     token min {
         |                         {make 0;}
         | (<number>) @minsyms     {make +$0 ÷ 60}}
@@ -412,14 +525,25 @@ grammar DMS {
 }
 
 #|««
-  Return an C<Angle> object initialised with the value given by the argument string.  
+  Return an C<Angle> object initialised with the value given by the argument string.
 »»
 
 our sub from-dms(Str $s) is export {
-    my $m = Math::Angle::DMS.parse($s);
+    fail("from-dms called on HMS string") if $s.contains: @hrsyms.any;
+    my $m = Math::Angle::Sexagesimal.parse($s);
     if $m {
         Math::Angle.new(deg => +$m.made);
     } else {
         fail("unrecognised angle in string");
+    }
+}
+
+our sub from-hms(Str $s) is export {
+    fail "from-hms called on DMS string" if $s.contains: @degsyms.any;
+    my $m = Math::Angle::Sexagesimal.parse($s);
+    if $m {
+        Math::Angle.new(:hour( +$m.made ));
+    } else {
+        fail "unrecognised angle in string";
     }
 }

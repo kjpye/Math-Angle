@@ -21,7 +21,7 @@ Math::Angle defines objects which represent angles.
 It was written to try to prevent the problems I kept encountering
 in forgetting to convert angles between radians and degrees.
 
-Thus an angle may be defined in terms of radians, degrees or grads,
+Thus an angle may be defined in terms of radians, degrees, hours, grads, or turns,
 and then used in trigonometric expressions without concern for conversion
 between units.
 
@@ -38,17 +38,30 @@ where it makes sense.
 =head2 Object creation
 
 C<Math::Angle> objects are created by calling the C<Math::Angle.new>
-routine with a named argument specifying the angle required. The following three possibilities are equivalent:
+routine with a named argument specifying the angle required. The following five possibilities are equivalent:
 
 =begin code :lang<raku>
-my $φ = Math::Angle.new(rad => π/4);
-my $η = Math::Angle.new(deg => 45);
-my $θ = Math::Angle.new(grad => 50);
+my $φ = Math::Angle.new(  :rad( π/4 ));
+my $λ = Math::Angle.new( :turn( 1/8 ));
+my $η = Math::Angle.new(  :deg( 45  ));
+my $θ = Math::Angle.new( :grad( 50  ));
+my $α = Math::Angle.new( :hour( 3  ));
+=end code
+
+When C<Math::Angle.new> is called on named arguments C<min> or
+C<sec> without also supplying C<deg> or C<hour>, then the minutes
+and seconds are interpreted as minutes and seconds of arc, not of
+time-angle: that is, as if C<:deg(0)> accompanied them. Use C<:hour(0)>
+to force the other interpretation.
+
+=begin code :lang<raku>
+my Math::Angle $b .= new( :min(30) :sec(30) );
+say $b.dms              # OUTPUT: 0° 30′ 30.0000″
 =end code
 
 =head2 Accessing the angle value
 
-The angle embedded within a C<Math::Angle> object can be accessed using the three methods C<rad>, C<deg>, and C<grad> which convert the internal value to the requested representation
+The angle embedded within a C<Math::Angle> object can be accessed using the five methods C<rad>, C<deg>, C<hour>, C<grad> and C<turn> which convert the internal value to the requested representation
 
 Note that it is thus possible to convert an angle from degrees to radians by writing
 
@@ -59,7 +72,7 @@ Math::Angle.new(deg => 27).rad
 =head2 Arithmetic
 
 Arithmetic involving C<Math::Angle> objects is possible where it makes sense:
-                                                                                                          
+
 =begin code :lang<raku>
 my \φ1 = Math::Angle.new(:37deg);
 my \φ2 = Math::Angle.new(rad => π/6);
@@ -76,7 +89,7 @@ representing the ratio of the two angles.
 
 =head2 Coercion
 
-C<Math::Angle> has two coercion methods, C<Numeric> and C<Comples>.
+C<Math::Angle> has two coercion methods, C<Numeric> and C<Complex>.
 C<Numeric> returns the numeric value of the angle in radians. C<Complex> returns a complex number with radius 1 and angle given by the C<Math::Angle> object.
 
 C<Math::Angle> also inherits from C<Cool>. When combined with the C<Numeric>
@@ -113,7 +126,7 @@ C<asinh>,
 C<acosh>,
 C<atanh>,
 C<asech>,
-C<acosech>, and 
+C<acosech>, and
 C<acotanh>.
 
 =head3 from-dms
@@ -131,7 +144,7 @@ An optional decimal number of minutes followed by a minutes designator (one of a
 =item B<seconds>
 An optional decimal number of seconds followed by a seconds designator (one of a double quote C<">), the Unicode character C<U+2033>)—C<DOUBLE PRIME>, or the letter C<s> in either case);
 =item B<hemisphere>
-To allow for latitude and longitude to be represented easily, the angle can be followed by one of the letters C<E>, C<W>, C<N> or C<S> in either case. If the letter is C<N> or C<E> then the angle is positive; if it is C<S> or C<W> then the angle is negative. Note that if a sign is also present at the start of the string, then the two indicators are both used. Thus an angle like C<-12°S> will end up being positive,
+To allow for latitude and longitude to be represented easily, the angle can be followed by one of the letters C<E>, C<W>, C<N> or C<S> in either case. If the letter is C<N> or C<E> then the angle is positive; if it is C<S> or C<W> then the angle is negative. Note that if a sign is also present at the start of the string, then the two indicators are both used. Thus an angle like C<-12°S> will end up being positive.
 
 The various fields may be separated by white space.
 
@@ -141,9 +154,32 @@ Note that no sanity checks are made. An angle of "C<-2473.2857° 372974.2746′ 
 
 If the seconds are designated by the letter C<S> and a hemisphere is also specified, then they must be separated by whitespace.
 
+=head3 from-hms
+
+C<from-hms> takes a string argument representing an angle in hours, minutes, and seconds, and converts it into a Math::Angle object.
+
+The string contains:
+
+=item B<sign>
+An optional sign C<+> or C<->;
+=item B<hours>
+An optional decimal number of hours followed by an hour designator (one of the hour symbol (C<ʰ>) or a letter C<h> of either case);
+=item B<minutes>
+An optional decimal number of minutes followed by a minutes designator (one of the minute symbol (C<ᵐ>) or the letter C<m> in either case);
+=item B<seconds>
+An optional decimal number of seconds followed by a seconds designator (one of a seconds symbol C<ˢ>) or the letter C<s> in either case);
+
+The various fields may be separated by white space.
+
+The decimal numbers can be fractional, and contain exponents such as C<12.53e5>.
+
+Note that no sanity checks are made, as with degree-minute-second (see above).
+The values for hours, minutes and seconds are simply added together with the appropriate scaling and with the appropriate sign calculated
+from the initial sign.
+
 =head2 Alternative representations
 
-Two methods are available to produce string output in useful forms for angles expressed in degrees.
+Four methods are available to produce string output in useful forms for angles expressed in degrees or hours.
 
 =head3 dms
 
@@ -171,7 +207,7 @@ The full set of options is:
  degsym | A string representing the symbol printed after the number of degrees | "°" (unicode U00B0 — DEGREE SIGN)
  minsym | A string representing the symbol printed after the number of minutes | "′" (unicode U2032 — PRIME)
  secsym | (dms only) A string giving the symbol printed after the number of seconds | '″' (unicode U2033 — DOUBLE PRIME)
- presign | A string where the first chracter is printed before a positive number, and the second character is printed before a negative number | " -" (a space and a minus sign)
+ presign | A string where the first character is printed before a positive number, and the second character is printed before a negative number | " -" (a space and a minus sign)
  postsign | A string where the first character is printed after a positive number, and the second character is printed after a negative number | "  " (two spaces)
  separator | A string printed between the degrees and minutes, and between the minutes and seconds | " "
  secfmt | (dms only) The format string for the seconds field | "%.4f"
@@ -179,6 +215,35 @@ The full set of options is:
 =end table
 
 Note for C<presign> and C<postsign> that a blank in the string is not printed.
+
+=head3 hms
+
+Method C<hms> will return a string containing a representation of the angle in hours, minutes and seconds. For example:
+
+=begin code :lang<raku>
+Math::Angle.new(rad => 0.82).hms.say; # 3ʰ 7ᵐ 55.8094ˢ
+=end code
+
+The output is configurable for sign output and decimal format. For example:
+
+=begin code :lang<raku>
+Math::Angle.new(:rad(-0.82)).hms.say;                   # -3ʰ 7ᵐ 55.8094ˢ
+Math::Angle.new(:rad( 0.82)).hms(presign=>"+-").say;    # +3ʰ 7ᵐ 55.8094ˢ
+=end code
+
+The full set of options is:
+=begin table
+ option | meaning | default
+ _____
+ hrsym   | A string representing the symbol printed after the number of hours | "ʰ" (unicode U02B0 — MODIFIER LETTER SMALL H)
+ minsym  | A string representing the symbol printed after the number of minutes | "ᵐ" (unicode U1D50 — MODIFIER LETTER SMALL M)
+ secsym  | (hms only) A string giving the symbol printed after the number of seconds | 'ˢ' (unicode U02E2 — MODIFIER LETTER SMALL S)
+ presign | A string where the first character prefixes a positive number, and the second a negative number | " -" (space, minus sign)
+ secfmt  | The format string for the seconds field | "%.4f"
+ minfmt  | The format string for the minutes field | "%.4f"
+=end table
+
+Note for C<presign> that a blank in the string is not printed.
 
 =head3 dm
 
@@ -198,7 +263,25 @@ Math::Angle.new(rad => -0.82).dm(presign=>"", postsign=>"NS").say; # 46° 58.952
 Math::Angle.new(rad => -0.82).dm(presign=>"", postsign=>"EW").say; # 46° 58.9524′W
 =end code
 
-The options are the same as for dms, except that C<secsig> is not available and C<secfmt> is replaced by C<minfmt>.
+The options are the same as for dms, except that C<secsym> is not available and C<secfmt> is replaced by C<minfmt>.
+
+=head3 hm
+
+Method C<hm> will return a string containing a representation of the angle in hours and minutes. For example:
+
+=begin code :lang<raku>
+Math::Angle.new(:rad(0.82)).hm.say;                                             # 3ʰ 8ᵐ
+Math::Angle.new(:rad(-0.82)).hm(:minfmt('%07.4f') :hrsym(':') :minsym('')).say; # -3:07.9302
+=end code
+
+The same configurability as in C<hms> is available:
+
+=begin code :lang<raku>
+Math::Angle.new(rad => -0.82).dm.say; # -3ʰ07.9302ᵐ
+Math::Angle.new(rad => 0.82).dm(presign=>"+-").say; # +3ʰ07.9302ᵐ
+=end code
+
+The options are the same as for hms, except that C<secsym> is not available and C<secfmt> is replaced by C<minfmt>.
 
 =head1 AUTHOR
 
