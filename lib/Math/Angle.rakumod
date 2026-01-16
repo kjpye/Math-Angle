@@ -445,9 +445,6 @@ our sub acotanh(Real $a) is export {
 method Complex() {
     self.Numeric.cis;
 }
-method complex() {
-    self.Numeric.cis;
-}
 
 my @hrsyms  = <ʰ h H>;
 my @degsyms = <° d D>;
