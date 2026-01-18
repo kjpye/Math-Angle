@@ -2,6 +2,12 @@ Revision history for Math-Angle
 
 {{$NEXT}}
 
+0.1.1  2026-01-18T15:29:01+11:00
+    - Fix definition of subtraction of two angles
+    - Force number divided by angle to fail
+    - numerous tests added so Test::Coverage gives good results
+    - Fix new when only seconds are specified
+
 0.1.0  2026-01-16T15:48:55+11:00
     - Add turns and hms as forms of angle (arkiuat)
     - Miscellaneous typo and documentation fixes

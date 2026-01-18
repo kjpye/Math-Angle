@@ -1,0 +1,43 @@
+use Test;
+use Math::Angle;
+
+plan 30;
+
+my $a1 = Math::Angle.new(rad => π/4);
+my $a2 = Math::Angle.new(:30deg);
+
+is-approx ($a1 + $a1).rad, π/2, 'sum of two angles';
+is-approx ($a1 - $a1).rad, 0, 'difference of two angles';
+is-approx $a1 ÷ $a2, 1.5, 'ratio of two angles 1';
+is-approx $a1 / $a2, 1.5, 'ratio of two angles 2';
+is-approx ($a1*3).rad, 3×π/4, 'angle times number 1';
+is-approx ($a1×3).rad, 3×π/4, 'angle times number 2';
+is-approx (3*$a1).rad, 3×π/4, 'number time angle 1';
+is-approx (3×$a1).rad, 3×π/4, 'number time angle 2';
+is-approx ($a1/3).rad, π/12, 'angle divided by number 1';
+is-approx ($a1÷3).rad, π/12, 'angle divided by number 2';
+dies-ok   {3/$a1}, 'number divided by angle 1';
+dies-ok   {3÷$a1}, 'number divided by angle 2';
+
+is-approx $a1.sin, sin(π/4), 'sin';
+is-approx $a1.cos, cos(π/4), 'cos method';
+is-approx cos($a1), cos(π/4), 'cos function';
+is-approx asin(sqrt(2)/2).rad, π/4, 'asin';
+is-approx acos(sqrt(2)/2).rad, π/4, 'acos';
+is-approx atan(1).rad, π/4, 'atan';
+is-approx atan2(1, 0).rad, π/2, 'atan';
+is-approx asec(sqrt(2)).rad, π/4, 'asec';
+is-approx acosec(sqrt(2)).rad, π/4, 'acosec';
+is-approx acotan(1).rad, π/4, 'atan';
+is-approx asinh(1).rad, 0.8813735870195429, 'asinh';
+is-approx asech(0.5).rad, 1.316957896248166, 'asech';
+is-approx acosech(1).rad, 0.8813735870195429, 'acosech';
+is-approx acotanh(1.5).rad, 0.8047189562170501, 'acotanh';
+is-approx acosh(2).rad, 1.3169578969248166, 'acosh';
+is-approx atanh(0.5).rad, 0.5493061443340549, 'atanh';
+
+is-approx $a1.Complex.re, sqrt(2)/2, 'Complex real part';
+is-approx $a1.Complex.im, sqrt(2)/2, 'Complex imaginary part';
+
+
+done-testing; # optional with `plan`

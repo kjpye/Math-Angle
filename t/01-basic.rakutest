@@ -1,23 +1,22 @@
 use Test;
 use Math::Angle;
 
-plan 17;
+plan 20;
 
 my $a1 = Math::Angle.new(:45deg);
 my $a2 = Math::Angle.new(:rad(0.5));
 my $a3 = Math::Angle.new(:50grad);
 my $a4 = Math::Angle.new(:angle(2.3));
 my $a5 = Math::Angle.new(:turn(0.2));
+my $a6 = Math::Angle.new(:hour(4.6));
 
 is-approx $a1.deg, 45, 'round-trip degree input';
 is-approx $a2.rad, 0.5, 'round-trip radian input';
 is-approx $a3.grad, 50, 'round-trip grad input';
 is-approx $a5.turn, 0.2, 'round-trip turn input';
+is-approx $a6.hour, 4.6, 'round-trip hour input';
 dies-ok {$a4}, 'incorrectly specified value';
 is-approx Math::Angle.new(:45deg).rad, π/4, 'alternative input format';
-is-approx $a1.sin, sin(π/4), 'sin';
-is-approx $a1.cos, cos(π/4), 'cos method';
-is-approx cos($a1), cos(π/4), 'cos function';
 
 is-approx ($a1 + $a2).rad, π/4 + 0.5, 'addition of angles';
 is-approx ($a1 * 3).rad, 3 × π/4, 'multiplication angle by real';
@@ -27,5 +26,13 @@ is-approx ($a1 ÷ 2).rad, π/8, 'division angle by real(×)';
 is-approx ($a1 / $a3), 1, 'ratio of angles';
 is-approx Math::Angle::acos(sqrt(2)/2).rad, π/4, 'acos';
 is-approx Math::Angle::atan2(2, 1).rad, 1.1071487177, 'atan2';
+
+is-approx Math::Angle.new(rad => -π/2).normalize(range => POSITIVE), 3×π/2, 'positive normalization';
+is-approx Math::Angle.new(rad => 7×π/2).normalize, -π/2, 'symmetric normalization';
+
+is-approx 45°.deg, 45, 'degree sign postfix operatore';
+
+is-approx Math::Angle.new(min => 59, sec => 60).deg, 1.0, 'min & sec entry';
+is-approx Math::Angle.new(sec => 90).deg, 90/3600, 'sec only entry';
 
 done-testing; # optional with `plan`

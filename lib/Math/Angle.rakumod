@@ -42,10 +42,10 @@ submethod TWEAK( :$rad, :$grad, :$turn, :$deg is copy, :$hour is copy,
         fail 'Must specify exactly one of rad, deg, grad, hour, or turn';
     }
     $sec /= 60 with $sec;
-    with $min {
+#    with $min {
         $min += $sec // 0;
         $min /= 60;
-    }
+#    }
     with   $rad  { $!angle = $rad }
     orwith $grad { $!angle = $grad × grad2rad }
     orwith $turn { $!angle = $turn × turn2rad }
@@ -380,12 +380,31 @@ multi infix:<÷>(Math::Angle $a, Math::Angle $b) is export {
 }
 
 #|««
+  Force a failure when trying to divide a number by an angle.
+
+  This is necessary, because otherwise and angle is Cool, and will
+  be coerced to a number, and the operation will succeed.
+»»
+multi infix:</>(Real $a, Math::Angle $b) is export {
+    fail 'Cannot divide a number by a Math::Angle';
+}
+
+#|««
+  Force a failure when trying to divide a number by an angle.
+
+  As above, but with the Unicode operator
+»»
+multi infix:<÷>(Real $a, Math::Angle $b) is export {
+    fail 'Cannot divide a number by a Math::Angle';
+}
+
+#|««
   Return the difference between two angles. The result is an C<Angle>
   object which is not normalised in any way. I.e. it might be outside
   the range [-180, 360).
 »»
 multi infix:<->(Math::Angle $a, Math::Angle $b) is export {
-    Math::Angle.new(rad => $a.rad = $b.rad);
+    Math::Angle.new(rad => $a.rad - $b.rad);
 }
 
 # The inverse trigonetric functions returning a Math::Angle object

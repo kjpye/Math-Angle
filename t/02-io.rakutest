@@ -1,17 +1,24 @@
 use Test;
 use Math::Angle;
 
-plan 18;
+plan 27;
 
 my Math::Angle $pi7ths .= new: :rad(π/7);
 
 is-deeply from-dms('45°'), Math::Angle.new(:45deg), 'new from degree string';
 is-approx from-dms("25° 42m 51.42857S N").rad, $pi7ths.rad, 'from-dms';
 is-approx from-dms("25° 42′ 51.42857″ N").rad, $pi7ths.rad, 'from-dms';
+is-approx from-dms("25° 42′ 51.42857″ S").rad, -$pi7ths.rad, 'from-dms';
+is-approx from-dms("25° 42′ 51.42857″ E").rad, $pi7ths.rad, 'from-dms';
+is-approx from-dms("25° 42′ 51.42857″ W").rad, -$pi7ths.rad, 'from-dms';
+is-approx from-dms("1e5s").deg, 100000/3600, 'exponential form input';
+is-approx from-dms(".5°").deg, 0.5, 'numbers with decimals only';
 
 my Math::Angle $r1 .= new: :1rad;
 
 is-approx from-hms("3h 49m 11s").rad, $r1.rad, 'from-hms';
+is-approx from-hms("-3h 49m 11s").rad, -$r1.rad, 'from-hms';
+is-approx from-hms("+3h 49m 11s").rad, $r1.rad, 'from-hms';
 dies-ok { from-dms("3h 49m 11s") }, 'from-dms called on HMS string';
 dies-ok { from-hms("3° 49′ 11″") }, 'from-hms called on DMS string';
 
@@ -44,5 +51,8 @@ with $r1 {
     is .dms(:$postsign),  '-57° 17′ 44.8062″S', 'dms w/ neg postsign';
 }
 $r1 *= -1;
+
+is-approx from-dms('23m 78s').rad, 0.007068583470577035, 'from-dms with only minutes and seconds';
+is-approx from-hms('23m 78s').rad, 0.10602875205865521798, 'from-hms with only minutes and seconds';
 
 done-testing; # optional with `plan`
